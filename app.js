@@ -1,29 +1,28 @@
 /******** Data module - BUDGET CONTROLLE  */
 
-var budgetController = (function () {
-  var Expense = function (id, description, value) {
+var budgetController = (function() {
+  var Expense = function(id, description, value) {
     this.id = id;
     this.description = description;
     this.value = value;
   };
 
-  var Income = function (id, description, value) {
+  var Income = function(id, description, value) {
     this.id = id;
     this.description = description;
     this.value = value;
   };
 
   // calculate total income and expenses
-  var calculateTotal = function (type) {
+  var calculateTotal = function(type) {
     // type = inc or exp
     var sum = 0;
-    data.allItems[type].forEach(function (cur) {
+    data.allItems[type].forEach(function(cur) {
       // cur refers to either inc or exp object stored at the current position of the income or expense array
       // sum = sum + cur.value;
       sum += cur.value;
     });
     data.totals[type] = sum;
-
   };
 
   // Data structure
@@ -41,7 +40,7 @@ var budgetController = (function () {
   };
 
   return {
-    addItem: function (type, des, val) {
+    addItem: function(type, des, val) {
       // des for description
       // val for value
 
@@ -72,11 +71,10 @@ var budgetController = (function () {
       return newItem;
     },
 
-    calculateBudget: function () {
-
+    calculateBudget: function() {
       // calculate total income and expenses
-      calculateTotal('exp');
-      calculateTotal('inc');
+      calculateTotal("exp");
+      calculateTotal("inc");
 
       // calculate the budget: income - expenses
       data.budget = data.totals.inc - data.totals.exp;
@@ -89,7 +87,7 @@ var budgetController = (function () {
       }
     },
 
-    getBudget: function () {
+    getBudget: function() {
       // we need to return four values, so we use an object and the values as properties
       return {
         budget: data.budget,
@@ -99,7 +97,7 @@ var budgetController = (function () {
       };
     },
 
-    testing: function () {
+    testing: function() {
       console.log(data);
     }
   };
@@ -107,23 +105,23 @@ var budgetController = (function () {
 
 /******** UI module - UI CONTROLLER  */
 
-var UIController = (function () {
+var UIController = (function() {
   var DOMstrings = {
-    inputType: '.add__type',
-    inputDescription: '.add__description',
-    inputValue: '.add__value',
-    inputButton: '.add__btn',
-    incomeContainer: '.income__list',
-    expensesContainer: '.expenses__list',
-    budgetLabel: '.budget__value',
-    incomeLabel: '.budget__income--value',
-    expensesLabel: '.budget__expenses--value',
-    percentageLabel: '.budget__expenses--percentage'
-
+    inputType: ".add__type",
+    inputDescription: ".add__description",
+    inputValue: ".add__value",
+    inputButton: ".add__btn",
+    incomeContainer: ".income__list",
+    expensesContainer: ".expenses__list",
+    budgetLabel: ".budget__value",
+    incomeLabel: ".budget__income--value",
+    expensesLabel: ".budget__expenses--value",
+    percentageLabel: ".budget__expenses--percentage",
+    container: ".container"
   };
 
   return {
-    getInput: function () {
+    getInput: function() {
       return {
         type: document.querySelector(DOMstrings.inputType).value, // will be either inc or exp
         description: document.querySelector(DOMstrings.inputDescription).value,
@@ -131,60 +129,63 @@ var UIController = (function () {
       };
     },
 
-    addListItem: function (obj, type) {
+    addListItem: function(obj, type) {
       var html, newHtml, element;
       // Create HTML string with placeholder text
 
-      if (type === 'inc') {
+      if (type === "inc") {
         element = DOMstrings.incomeContainer;
 
-        html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class = "right clearfix"><div class = "item__value">%value%</div><div class="item__delete"><button class = "item__delete--btn"><i class = "ion-ios-close-outline"></i></button></div></div></div>';
-      } else if (type === 'exp') {
+        html =
+          '<div class="item clearfix" id="inc-%id%"><div class="item__description">%description%</div><div class = "right clearfix"><div class = "item__value">%value%</div><div class="item__delete"><button class = "item__delete--btn"><i class = "ion-ios-close-outline"></i></button></div></div></div>';
+      } else if (type === "exp") {
         element = DOMstrings.expensesContainer;
 
-        html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class = "right clearfix"><div class = "item__value">%value%</div><div class="item__percentage">21%</div><div class = "item__delete"><button class = "item__delete--btn"><i class = "ion-ios-close-outline"></i></button ></div></div></div>';
+        html =
+          '<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class = "right clearfix"><div class = "item__value">%value%</div><div class="item__percentage">21%</div><div class = "item__delete"><button class = "item__delete--btn"><i class = "ion-ios-close-outline"></i></button ></div></div></div>';
       }
 
       // Replace the placeholder text with actual data
-      newHtml = html.replace('%id%', obj.id);
-      newHtml = newHtml.replace('%description%', obj.description);
-      newHtml = newHtml.replace('%value%', obj.value);
+      newHtml = html.replace("%id%", obj.id);
+      newHtml = newHtml.replace("%description%", obj.description);
+      newHtml = newHtml.replace("%value%", obj.value);
 
       // Insert the HTML into the DOM
-      document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+      document.querySelector(element).insertAdjacentHTML("beforeend", newHtml);
     },
 
-    clearFields: function () {
+    clearFields: function() {
       var field, fieldsArr;
 
-      fields = document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue);
+      fields = document.querySelectorAll(
+        DOMstrings.inputDescription + ", " + DOMstrings.inputValue
+      );
 
       fieldsArr = Array.prototype.slice.call(fields);
 
       // we want to clear all these fields, so we want to see them empty
-      fieldsArr.forEach(function (current, index, array) {
+      fieldsArr.forEach(function(current, index, array) {
         current.value = "";
       });
 
       fieldsArr[0].focus();
-
     },
 
-    displayBudget: function (obj) {
+    displayBudget: function(obj) {
       document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget;
       document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc;
-      document.querySelector(DOMstrings.expensesLabel).textContent = obj.totalExp;
+      document.querySelector(DOMstrings.expensesLabel).textContent =
+        obj.totalExp;
 
       if (obj.percentage > 0) {
-        document.querySelector(DOMstrings.percentageLabel).textContent = obj.percentage + '%';
+        document.querySelector(DOMstrings.percentageLabel).textContent =
+          obj.percentage + "%";
       } else {
-        document.querySelector(DOMstrings.percentageLabel).textContent = '---';
-
+        document.querySelector(DOMstrings.percentageLabel).textContent = "---";
       }
-
     },
 
-    getDOMstrings: function () {
+    getDOMstrings: function() {
       return DOMstrings;
     }
   };
@@ -193,24 +194,27 @@ var UIController = (function () {
 /**************** Controller module - GLOBAL APP CONTROLLER */
 /**************** Connects the previous modules */
 
-var controller = (function (budgetCtrl, UICtrl) {
-  var setupEventListeners = function () {
+var controller = (function(budgetCtrl, UICtrl) {
+  var setupEventListeners = function() {
     var DOM = UICtrl.getDOMstrings();
 
     document
       .querySelector(DOM.inputButton)
       .addEventListener("click", ctrlAddItem);
 
-    document.addEventListener("keypress", function (event) {
+    document.addEventListener("keypress", function(event) {
       // for more older browsers use which instead of keyCode
       if (event.keyCode === 13 || event.which === 13) {
         ctrlAddItem();
       }
     });
+
+    document
+      .querySelector(DOM.container)
+      .addEventListener("click", ctrlDeleteItem);
   };
 
-  var updateBudget = function () {
-
+  var updateBudget = function() {
     // 1. Calculate the budget
     budgetCtrl.calculateBudget();
 
@@ -218,9 +222,9 @@ var controller = (function (budgetCtrl, UICtrl) {
     var budget = budgetCtrl.getBudget();
     // 3. Display the budget on the UI
     UICtrl.displayBudget(budget);
-  }
+  };
 
-  var ctrlAddItem = function () {
+  var ctrlAddItem = function() {
     var input, newItem;
 
     // 1. Get the field input data
@@ -241,8 +245,29 @@ var controller = (function (budgetCtrl, UICtrl) {
     }
   };
 
+  var ctrlDeleteItem = function(event) {
+    var itemID, splitID, type, ID;
+
+    // target property returns an HTML node in the DOM
+    itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
+
+    if (itemID) {
+      // format: inc-1
+      // method split
+      splitID = itemID.split("-");
+      type = sliptID[0];
+      ID = splitID[1];
+
+      // 1. Delete the item from the data structure
+
+      // 2. Delete the item from the UI
+
+      // 3. Update and show the new budget
+    }
+  };
+
   return {
-    init: function () {
+    init: function() {
       console.log("Application has started.");
       UICtrl.displayBudget({
         budget: 0,
