@@ -185,7 +185,8 @@ var UIController = (function () {
     incomeLabel: ".budget__income--value",
     expensesLabel: ".budget__expenses--value",
     percentageLabel: ".budget__expenses--percentage",
-    container: ".container"
+    container: ".container",
+    expensesPercLabel: '.item__percentage'
   };
 
   return {
@@ -256,6 +257,31 @@ var UIController = (function () {
       } else {
         document.querySelector(DOMstrings.percentageLabel).textContent = "---";
       }
+    },
+
+    displayPercentages: function (percentages) {
+
+      var fields = document.querySelectorAll(DOMstrings.expensesPercLabel); // it returns a nodeList
+
+      // the argument list is a node list
+      var nodeListForEach = function (list, callback) {
+        // for loop that in each iteration will call the callback function
+        for (var i = 0; i < list.length; i++) {
+          // the current is the list in position i
+          callback(list[i], i);
+        }
+      };
+
+      // nodeListForEach function reusable
+      // the function passed as an argument is a callback function
+      nodeListForEach(fields, function (current, index) {
+
+        if (percentages[i] > 0) {
+          current.textContent = percentages[index] + '%';
+        } else {
+          current.textContent = '---';
+        }
+      });
     },
 
     getDOMstrings: function () {
