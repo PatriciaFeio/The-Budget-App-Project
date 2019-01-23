@@ -1,23 +1,23 @@
 /******** Data module - BUDGET CONTROLLE  */
 
-var budgetController = (function() {
-  var Expense = function(id, description, value) {
+var budgetController = (function () {
+  var Expense = function (id, description, value) {
     this.id = id;
     this.description = description;
     this.value = value;
   };
 
-  var Income = function(id, description, value) {
+  var Income = function (id, description, value) {
     this.id = id;
     this.description = description;
     this.value = value;
   };
 
   // calculate total income and expenses
-  var calculateTotal = function(type) {
+  var calculateTotal = function (type) {
     // type = inc or exp
     var sum = 0;
-    data.allItems[type].forEach(function(cur) {
+    data.allItems[type].forEach(function (cur) {
       // cur refers to either inc or exp object stored at the current position of the income or expense array
       // sum = sum + cur.value;
       sum += cur.value;
@@ -40,7 +40,7 @@ var budgetController = (function() {
   };
 
   return {
-    addItem: function(type, des, val) {
+    addItem: function (type, des, val) {
       // des for description
       // val for value
 
@@ -71,7 +71,29 @@ var budgetController = (function() {
       return newItem;
     },
 
-    calculateBudget: function() {
+    deleteItem: function (type, id) {
+      var ids, index;
+
+      // id = 3
+      // cannot used this because the IDs are not in order:
+      //data.allItems[type][id];
+
+      // ids = [1 2 4 6 8]
+      // solution: creata an array with all the ID numbers that we have
+
+      // loop over all of the items in the incomes or expenses array
+      ids = data.allItems[type].map(function (current) {
+        return current.id;
+      });
+
+      index = ids.indexOf(id);
+
+      if (index !== = -1) {
+        data.allItems[type].splice(index, 1);
+      }
+    },
+
+    calculateBudget: function () {
       // calculate total income and expenses
       calculateTotal("exp");
       calculateTotal("inc");
@@ -87,7 +109,7 @@ var budgetController = (function() {
       }
     },
 
-    getBudget: function() {
+    getBudget: function () {
       // we need to return four values, so we use an object and the values as properties
       return {
         budget: data.budget,
@@ -97,7 +119,7 @@ var budgetController = (function() {
       };
     },
 
-    testing: function() {
+    testing: function () {
       console.log(data);
     }
   };
@@ -105,7 +127,7 @@ var budgetController = (function() {
 
 /******** UI module - UI CONTROLLER  */
 
-var UIController = (function() {
+var UIController = (function () {
   var DOMstrings = {
     inputType: ".add__type",
     inputDescription: ".add__description",
@@ -121,7 +143,7 @@ var UIController = (function() {
   };
 
   return {
-    getInput: function() {
+    getInput: function () {
       return {
         type: document.querySelector(DOMstrings.inputType).value, // will be either inc or exp
         description: document.querySelector(DOMstrings.inputDescription).value,
@@ -129,7 +151,7 @@ var UIController = (function() {
       };
     },
 
-    addListItem: function(obj, type) {
+    addListItem: function (obj, type) {
       var html, newHtml, element;
       // Create HTML string with placeholder text
 
@@ -154,7 +176,7 @@ var UIController = (function() {
       document.querySelector(element).insertAdjacentHTML("beforeend", newHtml);
     },
 
-    clearFields: function() {
+    clearFields: function () {
       var field, fieldsArr;
 
       fields = document.querySelectorAll(
@@ -164,14 +186,14 @@ var UIController = (function() {
       fieldsArr = Array.prototype.slice.call(fields);
 
       // we want to clear all these fields, so we want to see them empty
-      fieldsArr.forEach(function(current, index, array) {
+      fieldsArr.forEach(function (current, index, array) {
         current.value = "";
       });
 
       fieldsArr[0].focus();
     },
 
-    displayBudget: function(obj) {
+    displayBudget: function (obj) {
       document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget;
       document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc;
       document.querySelector(DOMstrings.expensesLabel).textContent =
@@ -185,7 +207,7 @@ var UIController = (function() {
       }
     },
 
-    getDOMstrings: function() {
+    getDOMstrings: function () {
       return DOMstrings;
     }
   };
@@ -194,27 +216,28 @@ var UIController = (function() {
 /**************** Controller module - GLOBAL APP CONTROLLER */
 /**************** Connects the previous modules */
 
-var controller = (function(budgetCtrl, UICtrl) {
-  var setupEventListeners = function() {
+var controller = (function (budgetCtrl, UICtrl) {
+  var setupEventListeners = function () {
     var DOM = UICtrl.getDOMstrings();
 
     document
       .querySelector(DOM.inputButton)
       .addEventListener("click", ctrlAddItem);
 
-    document.addEventListener("keypress", function(event) {
+    document.addEventListener("keypress", function (event) {
       // for more older browsers use which instead of keyCode
       if (event.keyCode === 13 || event.which === 13) {
         ctrlAddItem();
       }
     });
 
+    // setup event listener to do event delegation
     document
       .querySelector(DOM.container)
       .addEventListener("click", ctrlDeleteItem);
   };
 
-  var updateBudget = function() {
+  var updateBudget = function () {
     // 1. Calculate the budget
     budgetCtrl.calculateBudget();
 
@@ -224,7 +247,7 @@ var controller = (function(budgetCtrl, UICtrl) {
     UICtrl.displayBudget(budget);
   };
 
-  var ctrlAddItem = function() {
+  var ctrlAddItem = function () {
     var input, newItem;
 
     // 1. Get the field input data
@@ -245,21 +268,22 @@ var controller = (function(budgetCtrl, UICtrl) {
     }
   };
 
-  var ctrlDeleteItem = function(event) {
+  var ctrlDeleteItem = function (event) {
     var itemID, splitID, type, ID;
 
     // target property returns an HTML node in the DOM
+    // traversed the DOM to the element we're interested in
     itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
 
     if (itemID) {
-      // format: inc-1
+      // format: inc-1 (type-id)
       // method split
-      splitID = itemID.split("-");
-      type = sliptID[0];
-      ID = splitID[1];
+      splitID = itemID.split("-"); // it returns an array
+      type = sliptID[0]; // type is the first element of the array
+      ID = splitID[1]; // id is the second element of the array
 
       // 1. Delete the item from the data structure
-
+      budgetCtrl.deleteItem(type, id);
       // 2. Delete the item from the UI
 
       // 3. Update and show the new budget
@@ -267,7 +291,7 @@ var controller = (function(budgetCtrl, UICtrl) {
   };
 
   return {
-    init: function() {
+    init: function () {
       console.log("Application has started.");
       UICtrl.displayBudget({
         budget: 0,
