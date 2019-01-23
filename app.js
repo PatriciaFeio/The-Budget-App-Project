@@ -71,15 +71,17 @@ var budgetController = (function () {
       return newItem;
     },
 
+    // method to delete an item
     deleteItem: function (type, id) {
       var ids, index;
 
       // id = 3
-      // cannot used this because the IDs are not in order:
+      // cannot use this because the IDs are not in order:
       //data.allItems[type][id];
 
       // ids = [1 2 4 6 8]
-      // solution: creata an array with all the ID numbers that we have
+      // solution: create an array with all the ID numbers that we have
+      // and find out what is the index of the element we want to remove
 
       // loop over all of the items in the incomes or expenses array
       ids = data.allItems[type].map(function (current) {
@@ -88,7 +90,8 @@ var budgetController = (function () {
 
       index = ids.indexOf(id);
 
-      if (index !== = -1) {
+      // -1 is when the element doesn't exist
+      if (index !== -1) {
         data.allItems[type].splice(index, 1);
       }
     },
@@ -174,6 +177,11 @@ var UIController = (function () {
 
       // Insert the HTML into the DOM
       document.querySelector(element).insertAdjacentHTML("beforeend", newHtml);
+    },
+
+    deleteListItem: function (selectorID) {
+      var el = document.getElementById(selectorID);
+      el.parentNode.removeChild(el);
     },
 
     clearFields: function () {
@@ -279,11 +287,11 @@ var controller = (function (budgetCtrl, UICtrl) {
       // format: inc-1 (type-id)
       // method split
       splitID = itemID.split("-"); // it returns an array
-      type = sliptID[0]; // type is the first element of the array
-      ID = splitID[1]; // id is the second element of the array
+      type = splitID[0]; // type is the first element of the array
+      ID = parseInt(splitID[1]); // id is the second element of the array
 
       // 1. Delete the item from the data structure
-      budgetCtrl.deleteItem(type, id);
+      budgetCtrl.deleteItem(type, ID);
       // 2. Delete the item from the UI
 
       // 3. Update and show the new budget
